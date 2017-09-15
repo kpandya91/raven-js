@@ -82,7 +82,8 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 1);
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 2);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 4);
         }
       );
     });
@@ -101,7 +102,8 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          assert.isAbove(ravenData.stacktrace.frames.length, 0);
+          assert.isAtLeast(ravenData.stacktrace.frames.length, 1);
+          assert.isAtMost(ravenData.stacktrace.frames.length, 3);
 
           // verify trimHeadFrames hasn't slipped into final payload
           assert.isUndefined(ravenData.trimHeadFrames);
@@ -390,7 +392,9 @@ describe('integration', function() {
             assert.match(ravenData.exception.values[0].type, /^Error/);
           }
           assert.match(ravenData.exception.values[0].value, /realError$/);
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 0); // 1 or 2 depending on platform
+          // 1 or 2 depending on platform
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 1);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 2);
           assert.match(
             ravenData.exception.values[0].stacktrace.frames[0].filename,
             /\/test\/integration\/throw-error\.js/
@@ -474,7 +478,8 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 2);
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 3);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 5);
         }
       );
     });
@@ -522,7 +527,8 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 2);
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 3);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 4);
         }
       );
     });
@@ -542,7 +548,8 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 2);
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 3);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 4);
         }
       );
     });
@@ -563,7 +570,8 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 2);
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 3);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 4);
         }
       );
     });
@@ -596,7 +604,8 @@ describe('integration', function() {
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
           // # of frames alter significantly between chrome/firefox & safari
-          assert.isAbove(ravenData.exception.values[0].stacktrace.frames.length, 2);
+          assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 3);
+          assert.isAtMost(ravenData.exception.values[0].stacktrace.frames.length, 4);
         }
       );
     });
@@ -631,12 +640,8 @@ describe('integration', function() {
             breadcrumbs = Raven._breadcrumbs;
 
           assert.equal(breadcrumbs.length, 1);
-
           assert.equal(breadcrumbs[0].type, 'http');
           assert.equal(breadcrumbs[0].data.method, 'GET');
-          // NOTE: not checking status code because we seem to get
-          //       statusCode 0/undefined from Phantom when fetching
-          //       example.json (CORS issue?
         }
       );
     });
@@ -671,9 +676,6 @@ describe('integration', function() {
           assert.equal(breadcrumbs[0].type, 'http');
           assert.equal(breadcrumbs[0].category, 'xhr');
           assert.equal(breadcrumbs[0].data.method, 'GET');
-          // NOTE: not checking status code because we seem to get
-          //       statusCode 0/undefined from Phantom when fetching
-          //       example.json (CORS issue?
         }
       );
     });
