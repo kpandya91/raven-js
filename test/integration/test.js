@@ -35,6 +35,14 @@ function parseUrl(url) {
   return out;
 }
 
+function isBelowIE11() {
+  return /*@cc_on!@*/ false == !false;
+}
+
+function isEdge14() {
+  return window.navigator.userAgent.indexOf('Edge/14') !== -1;
+}
+
 describe('integration', function() {
   this.timeout(10000);
 
@@ -281,9 +289,12 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          console.log(ravenData.exception.values[0].type);
-          // IE10 and Edge14 ¯\_(ツ)_/¯
-          assert.match(ravenData.exception.values[0].type, /SyntaxError|undefined/);
+          // ¯\_(ツ)_/¯
+          if (isBelowIE11() || isEdge14()) {
+            assert.equal(ravenData.exception.values[0].type, undefined);
+          } else {
+            assert.match(ravenData.exception.values[0].type, /SyntaxError/);
+          }
           assert.equal(ravenData.exception.values[0].stacktrace.frames.length, 1); // just one frame
         }
       );
@@ -381,8 +392,12 @@ describe('integration', function() {
         },
         function() {
           var ravenData = iframe.contentWindow.ravenData[0];
-          // IE10 and Edge14 ¯\_(ツ)_/¯
-          assert.match(ravenData.exception.values[0].type, /^Error|undefined/);
+          // ¯\_(ツ)_/¯
+          if (isBelowIE11() || isEdge14()) {
+            assert.equal(ravenData.exception.values[0].type, undefined);
+          } else {
+            assert.match(ravenData.exception.values[0].type, /^Error/);
+          }
           assert.match(ravenData.exception.values[0].value, /realError$/);
           // 1 or 2 depending on platform
           assert.isAtLeast(ravenData.exception.values[0].stacktrace.frames.length, 1);
